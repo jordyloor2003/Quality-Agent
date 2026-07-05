@@ -1,0 +1,223 @@
+openapi: 3.0.3
+info:
+  title: FondoCesantia Payment API
+  description: API para registro y distribución de pagos de préstamos
+  version: 1.0.0
+  contact:
+    name: FondoCesantia Team
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+paths:
+  /pagos:
+    post:
+      summary: Registrar un pago contra un préstamo
+      operationId: registrarPago
+      tags:
+        - Pagos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrarPagoRequest'
+      responses:
+        '201':
+          description: Pago registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagoResponse'
+        '400':
+          description: Solicitud inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Préstamo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /pagos/{pagoId}/distribucion:
+    get:
+      summary: Obtener distribución de un pago registrado
+      operationId: obtenerDistribucion
+      tags:
+        - Pagos
+      parameters:
+        - name: pagoId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Distribución del pago
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistribucionResponse'
+        '404':
+          description: Pago no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /prestamos/{prestamoId}/cuotas:
+    get:
+      summary: Listar cuotas de un préstamo
+      operationId: listarCuotas
+      tags:
+        - Préstamos
+      parameters:
+        - name: prestamoId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lista de cuotas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CuotaResponse'
+        '404':
+          description: Préstamo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    RegistrarPagoRequest:
+      type: object
+      required:
+        - prestamoId
+        - montoPago
+        - operadorId
+      properties:
+        prestamoId:
+          type: integer
+          format: int64
+          description: ID del préstamo
+        montoPago:
+          type: number
+          description: Monto del pago
+          minimum: 0.01
+        operadorId:
+          type: integer
+          format: int64
+          description: ID del operador que registra
+        observacion:
+          type: string
+          description: Observaciones opcionales
+
+    PagoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        prestamoId:
+          type: integer
+          format: int64
+        montoPago:
+          type: number
+        fechaPago:
+          type: string
+          format: date-time
+        operadorId:
+          type: integer
+          format: int64
+        estado:
+          type: string
+          enum: [REGISTRADO, CONFIRMADO, RECHAZADO]
+
+    DistribucionResponse:
+      type: object
+      properties:
+        pagoId:
+          type: integer
+          format: int64
+        prestamoId:
+          type: integer
+          format: int64
+        montoTotal:
+          type: number
+        distribuciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistribucionCuota'
+        saldoAFavor:
+          $ref: '#/components/schemas/SaldoAFavorResponse'
+
+    DistribucionCuota:
+      type: object
+      properties:
+        cuotaId:
+          type: integer
+          format: int64
+        numeroCuota:
+          type: integer
+        estadoAnterior:
+          type: string
+        estadoNuevo:
+          type: string
+        montoAplicado:
+          type: number
+        saldoRestante:
+          type: number
+
+    SaldoAFavorResponse:
+      type: object
+      properties:
+        monto:
+          type: number
+        origen:
+          type: string
+
+    CuotaResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        numeroCuota:
+          type: integer
+        valorCuota:
+          type: number
+        valorCapital:
+          type: number
+        valorInteres:
+          type: number
+        fechaVencimiento:
+          type: string
+          format: date
+        saldoPagado:
+          type: number
+        estado:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        codigo:
+          type: string
+        mensaje:
+          type: string
+        detalles:
+          type: array
+          items:
+            type: string

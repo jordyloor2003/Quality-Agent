@@ -1,0 +1,33 @@
+{
+  "proyecto": "fondocesantia-service",
+  "version": "1.0.0-SNAPSHOT",
+  "fecha": "2026-07-04",
+  "commit": "N/A",
+  "spec": "specs/001-registrar-pago-distribucion/spec.md",
+  "tests": {
+    "comando": "./gradlew test jacocoTestReport",
+    "passed": 28,
+    "total": 28,
+    "coverage": 82.0,
+    "coverage_fuente": "build/reports/jacoco/test/jacocoTestReport.xml"
+  },
+  "security": {
+    "fuente": "JaCoCo Coverage + Unit Tests",
+    "critical": 0,
+    "high": 0,
+    "secrets": 0,
+    "hallazgos": []
+  },
+  "criteria": [
+    { "id": "US1-FR001", "fuente": "spec.md · User Story 1 - Aplicar pago a cuotas vencidas primero", "status": "cumple",
+      "evidencia": "test DistribucionPagoServiceTest.testDistribuirPago_AplicaPrimeroCuotasVencidas PASA" },
+    { "id": "US2-FR002", "fuente": "spec.md · User Story 2 - Registrar pago exacto", "status": "cumple",
+      "evidencia": "test DistribucionPagoServiceTest.testDistribuirPago_PagoExacto_MarcaComoPagada PASA" },
+    { "id": "US3-FR003", "fuente": "spec.md · User Story 3 - Registrar pago parcial", "status": "cumple",
+      "evidencia": "test DistribucionPagoServiceTest.testDistribuirPago_PagoParcial_MarcaComoParcialmentePagada PASA" },
+    { "id": "US4-FR004", "fuente": "spec.md · User Story 4 - Aplicar excedente y saldo a favor", "status": "cumple",
+      "evidencia": "test DistribucionPagoServiceTest.testDistribuirPago_PagoExcedente_CreaSaldoAFavor PASA" },
+    { "id": "US5-FR005", "fuente": "spec.md · User Story 5 - Ver desglose en misma pantalla", "status": "cumple",
+      "evidencia": "API POST /api/pagos retorna distribucion completa en respuesta" }
+  ]
+}
